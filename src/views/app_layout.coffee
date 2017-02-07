@@ -14,10 +14,9 @@ require 'normalize.css/normalize.css'
 
 module.exports = class AppLayout extends LayoutView
 
-    template: -> '<div id="notification" /><main />'
+    template: -> '<main />'
 
     el: '[role=application]'
 
     regions:
         content: 'main'
-        notification: '#notification'
