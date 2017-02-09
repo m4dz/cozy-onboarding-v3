@@ -1,10 +1,11 @@
-jQuery = require 'jquery'
 passwordHelper = require '../../lib/password_helper'
 
 module.exports = {
     name: 'password',
-    route: 'register/password',
     view : 'steps/password'
+
+    isDone: ({instance, contextToken}) ->
+        return (@name in instance.attributes.onboardedSteps) or !!contextToken
 
     # Return validation object
     # @see Onboarding.validate
@@ -23,9 +24,10 @@ module.exports = {
         return validation
 
     save: (data) ->
-        return fetch '/register/password',
-            method: 'POST',
-            credentials: 'include',
-            body: JSON.stringify data
-        .then @handleSaveSuccess, @handleServerError
+        return @onboarding.updateInstance(@name)
+            .then () =>
+                return @onboarding.savePassphrase data.password
+            .then @handleSaveSuccess, @handleServerError
+
+    needReloadAfterComplete: true
 }

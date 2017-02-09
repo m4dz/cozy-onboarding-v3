@@ -13,70 +13,84 @@ Onboarding = require './lib/onboarding'
 StepModel = require './models/step'
 ProgressionModel = require './models/progression'
 
+
+fetchApps = (domain) ->
+
+    headers = new Headers()
+    headers.append('Accept', 'application/vnd.api+json')
+
+    return fetch "#{domain}/apps/",
+      method: 'GET'
+      headers: headers
+    .then (response) ->
+        if response.ok and response.status is 200
+            return response.json().then (responseJson) ->
+              return responseJson.data
+        else
+            throw Error('Cannot fetch apps')
+    .catch (error) ->
+        console.error error
+
+
 class App extends Application
 
-    # URL for the redirection when the onboarding is finished
-    endingRedirection: '/'
+    # Application to redirect to when onboarding process is complete
+    targetApplication: 'io.cozy.manifests/files'
     accountsStepName: 'accounts'
     agreementStepName: 'agreement'
     ###
     Sets application
 
     We instanciate root application components
-    - router: we pass the app reference to it to easily get it without requiring
-              application module later.
     - layout: the application layout view, rendered.
     ###
     initialize: ->
         AppStyles = require './styles/app.styl'
 
-        @on 'start', (options)=>
+        applicationElement = document.querySelector '[role=application]'
 
-            @initializeRouter()
+        @contextToken = applicationElement.dataset.token
+        @domain = applicationElement.dataset.cozyStack
+
+        @on 'start', (options)=>
             @layout = new AppLayout()
             @layout.render()
 
             # Use pushState because URIs do *not* rely on fragment (see
             # `server/controllers/routes.coffee` file)
-            Backbone.history.start pushState: true if Backbone.history
+            Backbone.history.start pushState: false if Backbone.history
             Object.freeze @ if typeof Object.freeze is 'function'
 
+            @handleDefaultRoute registerToken: options.registerToken
 
-    # Initialize routes relative to onboarding step.
-    # The idea is to configure the router externally as a "native"
-    # Backbone Router
-    initializeRouter: () =>
-        @router = new Backbone.Router()
-        # if onboarding, the pathname will be '/register*'
-        @router.route \
-            'register(/:step)',
-            'register',
-            @handleRegisterRoute
 
-        @router.route \
-            'login(?next=*path)',
-            'login',
-            @handleLogin
-        @router.route \
-            'login(/*path)',
-            'login',
-            @handleLogin
-        @router.route \
-            'password/reset/:key',
-            'resetPassword',
-            @handleResetPassword
+    # Handle default route
+    handleDefaultRoute: (options) =>
+      @initializeOnboarding options
+        .then (onboarding) =>
+          onboarding.start()
 
 
     # Internal handler called when the onboarding's internal step has just
     # changed.
     # @param step Step instance
-    handleStepChanged: (step) ->
-        @showStep step
+    handleStepChanged: (onboarding, step) ->
+        @showStep onboarding, step
 
 
     # Internal handler called when the onboarding is finished
+    # Redirect to given app
     handleTriggerDone: () ->
-        window.location.replace @endingRedirection
+        url = "#{window.location.protocol}//#{@domain}"
+        fetchApps(url)
+          .then (apps) =>
+              app = apps.find (app) =>
+                return app.id is @targetApplication
+
+              if app and app.links and app.links.target
+                  window.location.replace app.links.target
+              else
+                  console.error 'No target Application has been found'
 
 
     # Update view with error message
@@ -90,51 +104,39 @@ class App extends Application
 
 
     # Initialize the onboarding component
-    initializeOnboarding: ->
+    initializeOnboarding: (options)->
         steps = require './config/steps/all'
 
-        user = {
-            public_name: ENV.public_name
-            hasValidInfos: ENV.hasValidInfos,
-            apps: ENV.apps
-        }
+        onboarding = new Onboarding()
 
-        onboarding = new Onboarding(user, steps, ENV.onboardedSteps)
-        onboarding.onStepChanged (step) => @handleStepChanged(step)
-        onboarding.onStepFailed (step, err) => @handleStepFailed(step, err)
-        onboarding.onDone () => @handleTriggerDone()
-
-        return onboarding
-
-
-    # Handler for register route, display onboarding's current step
-    handleRegisterRoute: =>
-        @onboarding ?= @initializeOnboarding()
-
-        # Load onboarding stylesheet
-        AppStyles = require './styles/app.styl'
-
-        currentStep = @onboarding.getCurrentStep()
-        @router.navigate currentStep.route
-        @onboarding.goToStep(currentStep)
+        return onboarding.initialize \
+            steps: steps,
+            domain: @domain,
+            contextToken: @contextToken,
+            registerToken: options.registerToken,
+            onStepChanged: (onboarding, step) => @handleStepChanged(onboarding, step),
+            onStepFailed: (step, err) => @handleStepFailed(step, err),
+            onDone: () => @handleTriggerDone()
 
 
     # Load the view for the given step
-    showStep: (step, err=null) =>
+    showStep: (onboarding, step, err=null) =>
         StepView = require "./views/#{step.view}"
-        nextStep = @onboarding.getNextStep step
+        nextStep = onboarding.getNextStep step
         next = nextStep?.route or @endingRedirection
 
         stepView = new StepView
             model: new StepModel step: step, next: next
             error: err
             progression: new ProgressionModel \
-                @onboarding.getProgression step
+                onboarding.getProgression step
 
         if step.name is @accountsStepName
             stepView.on 'browse:myaccounts', @handleBrowseMyAccounts
 
-        if step.name is @agreementStepName and ENV.HIDE_STATS_AGREEMENT
+        # Make this code better, maybe internalize into stepModel a way of
+        # retrieving data related to the step.
+        if step.name is @agreementStepName and onboarding.isStatsAgreementHidden()
             stepView.disableStatsAgreement()
 
         @layout.showChildView 'content', stepView

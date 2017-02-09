@@ -1,4 +1,3 @@
-
 # Local class Step
 class Step
 
@@ -8,15 +7,23 @@ class Step
     # Retrieves properties from config Step plain object
     # @param step : config step, i.e. plain object containing custom properties
     #   and methods.
-    constructor: (step={}, user={}) ->
+    constructor: (options={}) ->
+        { step,
+          onboarding,
+          onCompleted,
+          onFailed
+        } = options
+
         [
           'name',
           'route',
           'view',
           'isActive',
-          'fetchUser',
+          'isDone',
+          'fetchInstance',
           'fetchData',
           'getData',
+          'needReloadAfterComplete',
           'validate',
           'save',
           'error'
@@ -24,15 +31,10 @@ class Step
             if step[property]?
                 @[property] = step[property]
 
-        @fetchUser user
+        @onboarding = onboarding
 
-
-    # Map some user properties to current step object
-    # @param user : JS object representing the user.
-    # This method can be overriden by passing another fetchUser function
-    # in constructor parameters
-    fetchUser: (user={}) ->
-        @publicName = user.public_name
+        onCompleted and @onCompleted onCompleted
+        onFailed and @onFailed onFailed
 
 
     # Returns data related to step.
@@ -49,7 +51,7 @@ class Step
         return @error
 
 
-    fetchData: () ->
+    fetchData: (instance) ->
         return Promise.resolve(@)
 
 
@@ -70,10 +72,20 @@ class Step
 
     # Trigger 'completed' pseudo-event
     # returnValue is from configStep.submit
-    triggerCompleted: () ->
+    triggerCompleted: (data) ->
+        if @needReloadAfterComplete
+            if window \
+                and window.location \
+                    and typeof window.location.reload is 'function'
+                        window.location.reload()
+            else
+                throw new Error 'Cannot reload window'
+
+            return
+
         if @completedHandlers
             @completedHandlers.forEach (handler) =>
-                handler(@)
+                handler(@, data)
 
 
     triggerFailed: (error) ->
@@ -82,13 +94,22 @@ class Step
                 handler(@, error)
 
 
-    # Returns true if the step has to be submitted by the user
+    # Returns true if the step has to be submitted by the instance
     # This method returns true by default, but can be overriden
     # by config steps
-    # @param user : plain JS object. Not used in this abstract default method
+    # @param instance : plain JS object. Not used in this abstract default method
     #  but should be in overriding ones.
-    isActive: (user) ->
+    isActive: (instance) ->
         return true
+
+
+    # Determines whether or not the step seems completed, based only on
+    # given informations like instance data, presence of registerToken, presence
+    # of contextToken
+    # Default condition: we look into instance.attributes.onboardedSteps
+    isDone: ({instance, registerToken, contextToken}) ->
+        instance.attributes?.onboardedSteps ?= []
+        return @name in instance.attributes.onboardedSteps
 
 
     # Validate data related to step
@@ -118,7 +139,7 @@ class Step
                 message: validation.error,
                 errors: validation.errors
 
-        return @save cozy, data
+        return @save data
             .then @handleSubmitSuccess
 
 
@@ -127,27 +148,21 @@ class Step
         @triggerFailed error
 
     # Handler for submit success
-    handleSubmitSuccess: => @triggerCompleted()
+    handleSubmitSuccess: (data) =>
+      @triggerCompleted data
 
 
     # Save data
     # By default this method returns a resolved promise, but it can overriden
     # by specifying another save method in constructor parameters
     # @param data : JS object containing data to save
-    save: (cozy, data={}) ->
-        return Promise.resolve(data)
+    save: (data={}) ->
+        return @onboarding.updateInstance @name, data
+            .then @handleSaveSuccess, @handleServerError
 
     # Success handler for save() call
-    handleSaveSuccess: (response) =>
-        # Success ? Hell no we still have to check the status !
-        if not response.ok
-            return @handleServerError response unless response.status is 400
-
-            # Validation error
-            return response.json().then (json) =>
-                throw message: 'validation error', errors: json.errors
-
-        return response
+    handleSaveSuccess: (instance) =>
+        return instance
 
 
     _joinValues: (objectData, separator) =>
@@ -173,29 +188,159 @@ class Step
 module.exports = class Onboarding
 
 
-    constructor: (user, steps, onboardedSteps = []) ->
-        @initialize user, steps, onboardedSteps
+    initialize: (options={}) ->
+        { steps,
+          domain,
+          registerToken,
+          contextToken,
+          onStepChanged,
+          onStepFailed,
+          onDone } = options
 
-
-    initialize: (user, steps, onboardedSteps) ->
         throw new Error 'Missing mandatory `steps` parameter' unless steps
         throw new Error '`steps` parameter is empty' unless steps.length
 
-        @user = user
-        @steps = steps
-            .reduce (activeSteps, step) =>
-                stepModel = new Step step, user
-                if stepModel.isActive user
-                    activeSteps.push stepModel
-                    stepModel.onCompleted @handleStepCompleted
-                    stepModel.onFailed @handleStepError
-                return activeSteps
-            , []
+        @domain = domain
+        @contextToken = contextToken
+        @registerToken = registerToken
 
-        @currentStep = @steps?.find (step) ->
-            return not (step.name in onboardedSteps)
+        onStepChanged and @onStepChanged onStepChanged
+        onStepFailed and @onStepFailed onStepFailed
+        onDone and @onDone onDone
 
-        @currentStep ?= @steps[0]
+        @steps = steps.map (step) =>
+            return new Step \
+                step: step,
+                onboarding: @,
+                onCompleted: @handleStepCompleted,
+                onFailed: @handleStepError
+
+        return @fetchInstance()
+            .then (instance) =>
+                @getActiveSteps(instance)
+            .then () =>
+                return @
+
+
+    # Fetch instance data from cozy-stack
+    # @return a Promise
+    fetchInstance: ->
+        @instance = @fetchInstanceLocally()
+        return Promise.resolve @instance unless !@instance
+
+        url = new URL "#{window.location.protocol}//#{@domain}/settings/instance"
+
+        if not(@contextToken) and @registerToken
+          url.searchParams.append 'registerToken', @registerToken if @registerToken
+
+        headers = new Headers()
+        headers.append 'Accept', 'application/vnd.api+json'
+
+        if @contextToken
+            headers.append 'Authorization', "Bearer #{@contextToken}"
+
+        return fetch url, { headers: headers, credentials: 'include' }
+            .then @handleFetchInstanceSuccess, @handleFetchInstanceError
+
+
+    handleFetchInstanceSuccess: (response) =>
+        if not response.ok
+            e = new Error 'onboarding fetch instance error'
+            e.name = response.statusText
+            throw e
+
+        return response.json().then (jsonResponse) =>
+            instance = jsonResponse.data
+            @instance = instance
+            return @instance
+
+
+    handleFetchInstanceError: (error) ->
+        # TODO: Handle error properly
+        console.error error
+
+
+    getActiveSteps: (instance) ->
+        @activeSteps = @steps.filter (step) ->
+            return step.isActive instance
+
+
+    fetchInstanceLocally: ->
+        instance
+        try
+            instance = JSON.parse window.localStorage.getItem 'instance'
+        catch e
+            instance = null
+        console.debug instance
+        return instance
+
+
+    saveInstanceLocally: (instance) ->
+        console.debug instance
+        window.localStorage.setItem 'instance', JSON.stringify instance
+
+
+    removeLocalData: ->
+        window.localStorage.removeItem 'instance'
+
+
+    updateInstance: (stepName, data) ->
+        Object.assign @instance.attributes, data
+        @instance.attributes.onboardedSteps ?= []
+        @instance.attributes.onboardedSteps.push stepName
+
+        authorizedToSave = !!@contextToken
+
+        @saveInstanceLocally @instance
+
+        if authorizedToSave
+            headers = new Headers()
+            headers.append 'Host', 'alice.example.com'
+            headers.append 'Accept', 'application/vnd.api+json'
+            headers.append 'Content-type', 'application/vnd.api+json'
+            headers.append 'Authorization', "Bearer #{@contextToken}"
+
+            return fetch "#{window.location.protocol}//#{@domain}/settings/instance",
+                method: 'PUT',
+                headers: headers,
+                # Authentify
+                credentials: 'include',
+                body: JSON.stringify data: @instance
+            .then (response) =>
+                if response.ok and response.status is 200
+                    return response.json().then (responseJson) =>
+                        @instance = responseJson.data
+                        @removeLocalData()
+                        return @instance
+                else throw new 'Update instance error'
+        else
+            return Promise.resolve(@instance)
+
+
+    savePassphrase: (passphrase) ->
+        headers = new Headers()
+        headers.append 'Content-type', 'application/json'
+        return fetch "#{window.location.protocol}//#{@domain}/settings/passphrase",
+            headers: headers,
+            method: 'POST',
+            credentials: 'include',
+            body: JSON.stringify \
+                  passphrase: passphrase,
+                  register_token: @registerToken
+
+
+    # Star the onboarding, determines to current step and goes to it.
+    start: ->
+        @instance.attributes.onboardedSteps ?= []
+        @currentStep = @activeSteps?.find (step) =>
+            return not step.isDone \
+                instance: @instance,
+                registerToken: @registerToken,
+                contextToken: @contextToken
+
+        return @triggerDone() unless @currentStep
+
+        @goToStep @currentStep
 
 
     # Records handler for 'stepChanged' pseudo-event, triggered when
@@ -222,13 +367,14 @@ module.exports = class Onboarding
     # when it has been successfully submitted
     # Maybe validation should be called here
     # Maybe we will return a Promise or call some callbacks in the future.
-    handleStepCompleted: =>
+    handleStepCompleted: (step, data) =>
+        @instance = Object.assign {}, @instance, data
         @goToNext()
 
 
     # Go to the next step in the list.
     goToNext: () ->
-        currentIndex = @steps.indexOf(@currentStep)
+        currentIndex = @activeSteps.indexOf(@currentStep)
 
         if @currentStep? and currentIndex is -1
             throw Error 'Current step cannot be found in steps list'
@@ -236,8 +382,8 @@ module.exports = class Onboarding
         # handle magically the case not @currentStep and currentIndex is -1.
         nextIndex = currentIndex+1
 
-        if @steps[nextIndex]
-            @goToStep @steps[nextIndex]
+        if @activeSteps[nextIndex]
+            @goToStep @activeSteps[nextIndex]
         else
             @triggerDone()
 
@@ -245,15 +391,15 @@ module.exports = class Onboarding
     # Go directly to a given step.
     goToStep: (step) ->
         @currentStep = step
-        step.fetchData()
+        step.fetchData(@instance)
             .then @triggerStepChanged, @triggerStepErrors
 
 
     # Trigger a 'StepChanged' pseudo-event.
     triggerStepChanged: (step) =>
         if @stepChangedHandlers
-            @stepChangedHandlers.forEach (handler) ->
-                handler step
+            @stepChangedHandlers.forEach (handler) =>
+                handler @, step
 
 
     handleStepError: (step, err) =>
@@ -278,7 +424,7 @@ module.exports = class Onboarding
 
     # Returns an internal step by its name.
     getStepByName: (stepName) ->
-        return @steps.find (step) ->
+        return @activeSteps.find (step) ->
             return step.name is stepName
 
 
@@ -288,9 +434,9 @@ module.exports = class Onboarding
     # does not exist in the onboarding.
     getProgression: (step) ->
         return \
-            current: @steps.indexOf(step)+1,
-            total: @steps.length,
-            labels: @steps.map (step) -> step.name
+            current: @activeSteps.indexOf(step)+1,
+            total: @activeSteps.length,
+            labels: @activeSteps.map (step) -> step.name
 
 
     # Returns next step for the given step. Useful for knowing wich route to
@@ -299,21 +445,24 @@ module.exports = class Onboarding
         if not step
             throw new Error 'Mandatory parameter step is missing'
 
-        stepIndex = @steps.indexOf step
+        stepIndex = @activeSteps.indexOf step
 
         if stepIndex is -1
             throw new Error 'Given step missing in onboarding step list'
 
         nextStepIndex = stepIndex+1
 
-        if nextStepIndex is @steps.length
+        if nextStepIndex is @activeSteps.length
             return null
 
-        return @steps[nextStepIndex]
+        return @activeSteps[nextStepIndex]
 
 
     getCurrentStep: () =>
         return @currentStep
+
+
+    isStatsAgreementHidden: -> false
 
 
 # Step is exposed for test purposes only

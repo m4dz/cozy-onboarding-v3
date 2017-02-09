@@ -16,7 +16,7 @@ module.exports = {
   resolve: {
     extensions: ['', '.js', '.json', '.coffee', '.jade']
   },
-  devtool: build ? '#cheap-module-source-map' : 'eval',
+  devtool: '#source-map',
   module: {
     loaders: [
       {
@@ -35,14 +35,6 @@ module.exports = {
       {
         test: /\.json$/,
         loader: 'json'
-      },
-      {
-        test: /\.css$/,
-        loaders: [
-          'style-loader',
-          'css-loader?importLoaders=1',
-          'postcss-loader'
-        ]
       }
     ]
   },

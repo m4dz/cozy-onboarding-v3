@@ -1,23 +1,19 @@
 module.exports = {
     name: 'accounts',
-    route: 'register/accounts',
     view: 'steps/accounts',
 
-    isActive: (user) ->
-        return 'konnectors' in user.apps
+    isActive: (instance) ->
+        return instance.apps && 'konnectors' in instance.apps
 
     save: (data) ->
-        onboardedSteps = [
+        data.onboardedSteps = [
             'welcome',
             'agreement',
             'password',
             'infos',
             'accounts'
         ]
-        return fetch '/register',
-            method: 'PUT',
-            # Authentify
-            credentials: 'include',
-            body: JSON.stringify {onboardedSteps: onboardedSteps}
-        .then @handleSaveSuccess, @handleServerError
+
+        return @onboarding.updateInstance data
+            .then @handleSaveSuccess, @handleServerErrorr
 }
