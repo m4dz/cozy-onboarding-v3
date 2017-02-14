@@ -10,6 +10,11 @@
 // Variable used as divisor for px to em calculations.
 base-font-size = 16
 
+// Firefox is allow empty space for the svg index, and cause a top white space
+body > svg
+    height 0
+    width  0
+
 // LAYOUTS
 [role=application]
     min-height   100vh
