@@ -14,6 +14,10 @@ base-font-size = 16
 body > svg
     height 0
     width  0
+    // The best part now. It's the only way I found to tell Firefox to NOT
+    // add a tiny space in top of the body. I tested everything else like
+    // absolute position, negative margins, etc.
+    float left
 
 // LAYOUTS
 [role=application]
