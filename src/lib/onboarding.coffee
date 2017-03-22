@@ -271,12 +271,10 @@ module.exports = class Onboarding
             instance = JSON.parse window.localStorage.getItem 'instance'
         catch e
             instance = null
-        console.debug instance
         return instance
 
 
     saveInstanceLocally: (instance) ->
-        console.debug instance
         window.localStorage.setItem 'instance', JSON.stringify instance
 
 
