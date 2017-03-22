@@ -14,28 +14,8 @@ StepModel = require './models/step'
 ProgressionModel = require './models/progression'
 
 
-fetchApps = (domain) ->
-
-    headers = new Headers()
-    headers.append('Accept', 'application/vnd.api+json')
-
-    return fetch "#{domain}/apps/",
-      method: 'GET'
-      headers: headers
-    .then (response) ->
-        if response.ok and response.status is 200
-            return response.json().then (responseJson) ->
-              return responseJson.data
-        else
-            throw Error('Cannot fetch apps')
-    .catch (error) ->
-        console.error error
-
-
 class App extends Application
 
-    # Application to redirect to when onboarding process is complete
-    targetApplication: 'io.cozy.manifests/files'
     accountsStepName: 'accounts'
     agreementStepName: 'agreement'
     ###
@@ -81,16 +61,9 @@ class App extends Application
     # Internal handler called when the onboarding is finished
     # Redirect to given app
     handleTriggerDone: () ->
-        url = "#{window.location.protocol}//#{@domain}"
-        fetchApps(url)
-          .then (apps) =>
-              app = apps.find (app) =>
-                return app.id is @targetApplication
-
-              if app and app.links and app.links.related
-                  window.location.replace app.links.related
-              else
-                  console.error 'No target Application has been found'
+        url = "//#{@domain}"
+        # default app redirection is handled by the stack
+        window.location.replace url
 
 
     # Update view with error message
