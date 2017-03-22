@@ -5,7 +5,7 @@ Sets the browser environment to prepare it to launch the app, and then require
 the application.
 ###
 
-require('./lib/polyfills')
+require('babel-polyfill')
 
 Polyglot = require 'node-polyglot'
 

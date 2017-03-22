@@ -17,11 +17,6 @@
       "description": "Required to register user",
       "type": "io.cozy.settings",
       "verbs": ["GET", "POST", "PUT"]
-    },
-    "applications": {
-      "description": "Required to redirect to your default app",
-      "type": "io.cozy.applications",
-      "verbs": ["GET"]
     }
   },
   "routes": {
