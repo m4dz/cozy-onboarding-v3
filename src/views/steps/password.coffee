@@ -10,8 +10,12 @@ module.exports = class PasswordView extends StepView
     events:
         'click .next': 'onSubmit'
         'click [action=password-visibility]': 'onToggleVisibility'
-        'keyup input': 'checkPasswordStrength'
 
+        'change input': 'checkPasswordStrength'
+        'input input': 'checkPasswordStrength'
+        'keyup input': 'checkPasswordStrength'
+        'mouseup input': 'checkPasswordStrength'
+        'paste input': 'checkPasswordStrength'
 
     isVisible: false
 
