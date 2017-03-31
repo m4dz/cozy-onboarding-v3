@@ -30,7 +30,7 @@ describe('PasswordHelper', () => {
 
     it('should be between 33% and 66% "moderate" label for "Azerty1aze$"', () => {
       // arrange
-      let password = 'Azerty1aze$'
+      let password = 'Azerty1az'
 
       // act
       let strength = passwordHelper.getStrength(password)
@@ -43,7 +43,7 @@ describe('PasswordHelper', () => {
 
     it('should be above 66% and "strong" label for "Azerty1aze$uiopqs9LT"', () => {
       // arrange
-      let password = 'Azerty1aze$uiopqs9LT'
+      let password = 'Azerty1aze$uiopL'
 
       // act
       let strength = passwordHelper.getStrength(password)
