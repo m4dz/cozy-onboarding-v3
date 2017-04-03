@@ -104,7 +104,6 @@ module.exports = class PasswordView extends StepView
     getDataForSubmit: ->
         return {
             password: @$inputPassword.val()
-            onboardedSteps: ['welcome', 'agreement', 'password']
         }
 
     renderError: (error) ->
