@@ -14,7 +14,7 @@ block region
         if figureid
           figure.service-logo(class=service)
             svg: use(xlink:href=figureid)
-        .service-name t('step maif service')
+        .service-name= t('step maif service')
         .service-actions
           button= t('step maif next')
 
