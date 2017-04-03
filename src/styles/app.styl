@@ -92,6 +92,14 @@ header
         height          12.5em
         box-shadow      none
 
+#maif-figure
+    .svg-wrapper
+        background-color $maif
+
+    svg
+        max-width       100%
+        height          100%
+
 
 // Icons
 .svg-wrapper
@@ -279,6 +287,16 @@ button
             margin-right (-24/base-font-size)em
             @extend    $icon-spinner-white
 
+.pass
+  text-align center
+  a
+    font-size .875em
+    line-height 1.7
+    text-transform uppercase
+    color $grey-09
+    &:hover,  &:focus
+        color $blue
+
 
 .errors
     color  $red
@@ -425,3 +443,57 @@ footer
 
         .forgot
             display none
+
+// Services
+.services
+    display flex
+    justify-content center
+    align-items stretch
+    margin-left -7.5em
+    margin-right -7.5em
+
+.service
+    flex 0 0 14em
+    margin .75em
+    border 1px solid $grey-10
+    border-radius 4px
+    overflow hidden
+    padding-top 1rem
+    text-align center
+
+.service-logo
+    margin 1rem auto .75rem
+
+    svg
+        max-width       100%
+        height          100%
+
+.service-name
+    margin-bottom .5rem
+    padding 0 1rem
+    font-weight bold
+    line-height 1.5
+
+.service-actions
+    display flex
+    justify-content space-around
+    align-items stretch
+    padding .6rem 0 .4rem
+    background-color $grey-11
+
+    button
+      width auto
+      min-height auto
+      padding 0
+      background none
+      line-height 2
+      font-size .75rem
+      font-weight bold
+      color $blue
+
+.service-logo--maif
+    box-sizing border-box
+    width 4.25rem
+    height 4.25rem
+    padding .5rem .5rem .75rem
+    background-color $maif
