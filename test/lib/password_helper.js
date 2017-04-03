@@ -28,7 +28,7 @@ describe('PasswordHelper', () => {
       assert.equal(strength.label, 'weak')
     })
 
-    it('should be between 33% and 66% "moderate" label for "Azerty1aze$"', () => {
+    it('should be between 33% and 66% "moderate" label for "Azerty1az"', () => {
       // arrange
       let password = 'Azerty1az'
 
@@ -41,7 +41,7 @@ describe('PasswordHelper', () => {
       assert.equal(strength.label, 'moderate')
     })
 
-    it('should be above 66% and "strong" label for "Azerty1aze$uiopqs9LT"', () => {
+    it('should be above 66% and "strong" label for "Azerty1aze$uiopL"', () => {
       // arrange
       let password = 'Azerty1aze$uiopL'
 
