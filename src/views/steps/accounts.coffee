@@ -29,7 +29,7 @@ module.exports = class AccountsView extends StepView
     serializeData: ->
         _.extend super,
             id: "#{@model.get 'name'}-figure"
-            figureid: require '../../assets/sprites/icon-cogs.svg'
+            figureid: require '../../assets/sprites/icon-thumbup.svg'
 
 
     renderError: (error) ->
