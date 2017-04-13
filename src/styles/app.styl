@@ -288,7 +288,6 @@ button
     &[aria-busy=true]
 
         &::after
-            position static
             width      (16/base-font-size)em
             height     (16/base-font-size)em
             margin-left (8/base-font-size)em
@@ -511,11 +510,6 @@ footer
       &[aria-busy=true]
 
           &::after
-              position static
-              width      (16/base-font-size)em
-              height     (16/base-font-size)em
-              margin-left (8/base-font-size)em
-              margin-right (-24/base-font-size)em
               @extend    $icon-spinner-blue
 
 .service-logo--maif
