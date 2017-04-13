@@ -1,0 +1,31 @@
+extends _base
+
+
+block header
+    h1=t('step fing title')
+
+block region
+    p= t('step fing description line 1')
+
+    p(class="errors")
+
+    div(class="services")
+      .service
+        if figureid
+          figure.service-logo(class=service)
+            svg: use(xlink:href=figureid)
+        .service-name= t('step edf service')
+        .service-actions
+          button= t('step edf connect')
+      .service
+        if figureid
+          figure.service-logo(class=service)
+            svg: use(xlink:href=figureid)
+        .service-name= t('step orange service')
+        .service-actions
+          button= t('step orange connect')
+
+block controls
+    button(class="next", aria-disabled="true")= t('step fing next')
+    p(class="pass")
+      a(href="#")= t('step fing pass')

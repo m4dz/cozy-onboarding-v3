@@ -11,6 +11,7 @@ module.exports = {
             'agreement',
             'password',
             'infos',
+            'fing',
             'accounts'
         ]
 
