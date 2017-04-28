@@ -17,10 +17,6 @@ module.exports = class ServiceView extends ItemView
 
     initialize: (options) ->
         @slug = options.slug
-        @intent =  {
-            action: 'PICK'
-            type: 'io.cozy.files' # Temporary value
-        }
 
         @onIntentStart = () =>
             if typeof options.onIntentStart is 'function'
@@ -57,7 +53,7 @@ module.exports = class ServiceView extends ItemView
 
 
         cozy.client.intents
-            .create @intent.action, @intent.type
+            .create 'CREATE', 'io.cozy.accounts', slug: @slug
             .start modal.getContentWrapper()
             .then (doc) =>
                 modal.hide()
