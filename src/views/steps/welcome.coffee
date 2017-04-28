@@ -18,14 +18,6 @@ FORMS_DIS_ELEMENTS = [
 module.exports = class WelcomeView extends StepView
     template: require '../templates/view_steps_welcome'
 
-    ui:
-        next: '.controls .next',
-        errors: '.errors'
-
-    events:
-        'click @ui.next': 'onSubmit'
-
-
     serializeData: ->
         _.extend super,
             link:     'https://cozy.io'

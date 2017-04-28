@@ -49,14 +49,10 @@ module.exports = class MaifView extends StepView
 
 
     onSubmit: (event) ->
-        event.preventDefault()
-        return unless not @isSubmitDisabled
-        if not @stepDisabled
-            @disableSubmit()
-            @model
-                .submit()
-                .then null, (error) =>
-                    @showError error.message
+        if @stepDisabled
+          event.preventDefault()
+        else
+          super event
 
 
     serializeData: ->

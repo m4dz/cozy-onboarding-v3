@@ -9,7 +9,11 @@ module.exports = class StepView extends LayoutView
         progression: '.progression'
 
     ui:
+        next: '.controls .next',
         errors: '.errors'
+
+    events:
+        'click @ui.next': 'onSubmit'
 
 
     initialize: (options) ->
@@ -31,6 +35,8 @@ module.exports = class StepView extends LayoutView
       @disableSubmit()
 
       @model.submit data
+        .then null, (error) =>
+            @showError error.message
 
 
     # disable submit button and store state into @isSubmitDisabled.

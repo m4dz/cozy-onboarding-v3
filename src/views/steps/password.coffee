@@ -7,9 +7,6 @@ module.exports = class PasswordView extends StepView
 
     template: require '../templates/view_steps_password'
 
-    ui:
-        errors: '.errors'
-
     events:
         'click .next': 'onSubmit'
         'click [action=password-visibility]': 'onToggleVisibility'
@@ -104,19 +101,13 @@ module.exports = class PasswordView extends StepView
 
 
     onSubmit: (event)->
-        event?.preventDefault()
-        return unless not @isSubmitDisabled
-
         data = @getDataForSubmit()
         validation = @model.validate data
         if not validation.success
+            event.preventDefault()
             errors = validation.errors
             if errors?.password
                 @$inputPassword.addClass('error')
                 @showError(errors.password)
         else
-            @disableSubmit()
-            @model
-                .submit data
-                .then null, (error) =>
-                    @showError error.message
+            super event, data

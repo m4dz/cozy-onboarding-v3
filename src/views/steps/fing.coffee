@@ -9,27 +9,13 @@ module.exports = class FingView extends StepView
         next: '.controls .next'
         pass: '.controls .pass'
 
+    regions:
+        progression: '.progression'
+        services: '.services'
+
     events:
         'click @ui.next': 'onSubmit'
         'click @ui.pass': 'onSubmit'
-
-
-    onRender: (args...) ->
-        super args...
-        @$errorContainer=@$('.errors')
-
-        if @error
-            @renderError(@error)
-        else
-            @$errorContainer.hide()
-
-
-    onSubmit: (event) ->
-        event.preventDefault()
-        @model
-            .submit()
-            .then null, (error) =>
-                @renderError error.message
 
 
     serializeData: ->
@@ -39,8 +25,3 @@ module.exports = class FingView extends StepView
             figureid: require '../../assets/sprites/fing.svg'
             edfLogo: require '../../assets/sprites/edf.svg'
             orangeLogo: require '../../assets/sprites/orange.svg'
-
-
-    renderError: (error) ->
-        @$errorContainer.html(t(error))
-        @$errorContainer.show()
