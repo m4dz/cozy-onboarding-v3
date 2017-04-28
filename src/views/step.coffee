@@ -24,6 +24,15 @@ module.exports = class StepView extends LayoutView
     onRender: () ->
         @showChildView 'progression', @progressionView
 
+
+    onSubmit: (event, data) ->
+      event.preventDefault()
+      return unless not @isSubmitDisabled
+      @disableSubmit()
+
+      @model.submit data
+
+
     # disable submit button and store state into @isSubmitDisabled.
     disableSubmit: () ->
         @isSubmitDisabled = true

@@ -105,6 +105,8 @@ module.exports = class PasswordView extends StepView
 
     onSubmit: (event)->
         event?.preventDefault()
+        return unless not @isSubmitDisabled
+
         data = @getDataForSubmit()
         validation = @model.validate data
         if not validation.success
@@ -113,6 +115,7 @@ module.exports = class PasswordView extends StepView
                 @$inputPassword.addClass('error')
                 @showError(errors.password)
         else
+            @disableSubmit()
             @model
                 .submit data
                 .then null, (error) =>

@@ -44,12 +44,15 @@ module.exports = class MaifView extends StepView
             onIntentError: (error) =>
                 @showError 'intent service error'
                 console.error error
+                @enableStep()
         }
 
 
     onSubmit: (event) ->
         event.preventDefault()
+        return unless not @isSubmitDisabled
         if not @stepDisabled
+            @disableSubmit()
             @model
                 .submit()
                 .then null, (error) =>

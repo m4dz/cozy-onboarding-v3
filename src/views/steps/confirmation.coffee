@@ -24,6 +24,8 @@ module.exports = class ConfirmationView extends StepView
 
     onSubmit: (event) ->
         event.preventDefault()
+        return unless not @isSubmitDisabled
+        @disableSubmit()
         @model
             .submit()
             .then null, (error) =>

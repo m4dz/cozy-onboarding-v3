@@ -44,12 +44,11 @@ module.exports = class AgreementView extends StepView
 
 
     onSubmit: (event)->
-        event.preventDefault()
         if @isStatsAgreementDisabled
             allowStats = false
         else
             allowStats = @ui.checkbox?[0].checked
-        @model.submit {allowStats: allowStats}
+        super event, {allowStats: allowStats}
 
 
     # function use by the application to hide/display the stats checbox
