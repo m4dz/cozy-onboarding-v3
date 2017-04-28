@@ -16,8 +16,11 @@ module.exports = class ServiceView extends ItemView
 
 
     initialize: (options) ->
-        @service = options.service
-        @intent = options.intent
+        @slug = options.slug
+        @intent =  {
+            action: 'PICK'
+            type: 'io.cozy.files' # Temporary value
+        }
 
         @onIntentStart = () =>
             if typeof options.onIntentStart is 'function'
@@ -38,7 +41,9 @@ module.exports = class ServiceView extends ItemView
 
     serializeData: () ->
         _.extend super,
-            @service
+            name: "step #{@slug} service",
+            service: "service-logo--#{@slug}",
+            figureid: require "../../../assets/sprites/#{@slug}.svg"
 
 
     onConnect: () ->

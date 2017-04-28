@@ -1,0 +1,13 @@
+extends _base
+
+
+block header
+    h1=t(title)
+
+block region
+    div(class="services")
+
+block controls
+    button(class="next", aria-disabled="true", disabled="disabled")= t('step services next')
+    p(class="pass")
+      a(href="#")= t('step services pass')
