@@ -10,6 +10,8 @@ module.exports = class ServiceView extends ItemView
 
     ui:
         connect: '.connect'
+        actions: '.service-actions'
+        result: '.service-success .result'
 
     events:
       'click .connect': 'onConnect'
@@ -55,9 +57,13 @@ module.exports = class ServiceView extends ItemView
         cozy.client.intents
             .create 'CREATE', 'io.cozy.accounts', slug: @slug
             .start modal.getContentWrapper()
-            .then (doc) =>
+            .then (account) =>
                 modal.hide()
-                @onIntentSuccess doc
+                if account
+                  @showSuccess account
+                  @onIntentSuccess account
+                else
+                  @onIntentEnd null
             .catch (error) =>
                 modal.hide()
                 @onIntentError error
@@ -82,3 +88,8 @@ module.exports = class ServiceView extends ItemView
     disableConnect: () ->
         @ui.connect.attr 'disabled', 'disabled'
         @ui.connect.attr 'aria-disabled', 'true'
+
+    showSuccess: (account) ->
+        @ui.actions.hide()
+        @ui.result.text(account._id)
+        @$el.addClass('done')
