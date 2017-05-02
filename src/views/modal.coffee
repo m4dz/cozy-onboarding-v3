@@ -44,6 +44,7 @@ module.exports = class ModalView extends ItemView
             else
                 @show()
 
+        @waiting = true
         observer.observe contentWrapperElement, childList: true
 
 
@@ -61,6 +62,8 @@ module.exports = class ModalView extends ItemView
 
 
     hide: () ->
+        return @dispose() unless not @waiting
+
         @$el.one 'transitionend', () =>
             if typeof @onHide is 'function'
                 @onHide()
@@ -69,5 +72,6 @@ module.exports = class ModalView extends ItemView
         @ui.modalOverlay.attr 'aria-hidden', 'true'
 
     show: () ->
+        @waiting = false
         @ui.modalOverlay.attr 'aria-hidden', 'false'
         @ui.modalOverlay.on 'click', () => @hide()

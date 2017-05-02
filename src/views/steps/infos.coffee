@@ -85,6 +85,8 @@ module.exports = class InfosView extends StepView
 
     onSubmit: (event) ->
         event.preventDefault()
+        return unless not @isSubmitDisabled
+        @disableSubmit()
         @model
             .submit @getFormData()
             .then null, (error) =>

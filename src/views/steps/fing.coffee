@@ -1,46 +1,12 @@
-StepView = require '../step'
-_ = require 'underscore'
+ServicesStepView = require './services'
 
 
-module.exports = class FingView extends StepView
-    template: require '../templates/view_steps_fing'
+module.exports = class FingView extends ServicesStepView
 
-    ui:
-        next: '.controls .next'
-        pass: '.controls .pass'
+    title: 'step fing title'
 
-    events:
-        'click @ui.next': 'onSubmit'
-        'click @ui.pass': 'onSubmit'
+    figure:
+      id: 'fing-figure'
+      svg: require '../../assets/sprites/fing.svg'
 
-
-    onRender: (args...) ->
-        super args...
-        @$errorContainer=@$('.errors')
-
-        if @error
-            @renderError(@error)
-        else
-            @$errorContainer.hide()
-
-
-    onSubmit: (event) ->
-        event.preventDefault()
-        @model
-            .submit()
-            .then null, (error) =>
-                @renderError error.message
-
-
-    serializeData: ->
-        _.extend super,
-            id: "#{@model.get 'name'}-figure"
-            service: "service-logo--#{@model.get 'name'}"
-            figureid: require '../../assets/sprites/fing.svg'
-            edfLogo: require '../../assets/sprites/edf.svg'
-            orangeLogo: require '../../assets/sprites/orange.svg'
-
-
-    renderError: (error) ->
-        @$errorContainer.html(t(error))
-        @$errorContainer.show()
+    services: ['edf', 'orange']
