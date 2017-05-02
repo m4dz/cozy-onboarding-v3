@@ -481,6 +481,13 @@ footer
     padding-top 1rem
     text-align center
 
+    &.done
+      .service-actions
+        display none
+
+      .service-success
+        display flex
+
 .service-logo
     box-sizing border-box
     margin 1rem auto .75rem
@@ -521,6 +528,35 @@ footer
 
       &[aria-busy=true]::after
         @extend $icon-spinner-blue
+
+.service-success
+    display          none
+    justify-content space-around
+    align-items stretch
+    position         relative
+    background-color transparent
+    color            $grey-09
+    padding          0 (32/base-font-size)em
+    height           (32/base-font-size)em
+
+    .result
+      overflow      hidden
+      text-overflow ellipsis
+
+    .icon-check
+      position            absolute
+      top                 (-2/base-font-size)em
+      right               (8/base-font-size)em
+      width               (24/base-font-size)em
+      height              (24/base-font-size)em
+      border-radius       (12/base-font-size)em
+      background-repeat   no-repeat
+      background-color    #35CE68
+      background-image    embedurl("../../assets/sprites/icon-checked-16.svg");
+      background-position center center
+
+   &[aria-hidden=true]
+      display none
 
 
 // Modal
