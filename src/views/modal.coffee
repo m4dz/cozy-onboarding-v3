@@ -58,7 +58,9 @@ module.exports = class ModalView extends ItemView
 
 
     dispose: () ->
-        @el.parentNode.removeChild @el
+        if not @disposed
+          @document.body.removeChild @el
+          @disposed = true
 
 
     hide: () ->
