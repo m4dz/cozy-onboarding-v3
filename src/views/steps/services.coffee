@@ -2,7 +2,7 @@ StepView = require '../step'
 ServiceView = require './subviews/service'
 _ = require 'underscore'
 
-# Abstract class used for step presenting services, like MAIF or Fing
+# Abstract class used for step presenting services, like Fing
 module.exports = class ServicesStepView extends StepView
     template: require '../templates/services_step'
 
