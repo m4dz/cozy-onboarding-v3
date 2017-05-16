@@ -1,7 +1,6 @@
 # List of onboarding steps.
 # Every steps are in the same file now, but the idea is to
 # At this time there is only proper
-maif = require './maif'
 fing = require './fing'
 welcome = require './welcome'
 agreement = require './agreement'
@@ -13,6 +12,5 @@ confirmation = require './confirmation'
 module.exports = [
     password,
     infos,
-    maif,
     fing
-  ]
+]
