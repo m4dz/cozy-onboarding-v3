@@ -14,8 +14,7 @@ module.exports = class InfosView extends StepView
 
     fields: [
         'public_name',
-        'email',
-        'timezone'
+        'email'
     ]
 
     initialize: (args...) ->
@@ -52,7 +51,6 @@ module.exports = class InfosView extends StepView
         _.extend super,
             id: "#{@model.get 'name'}-figure"
             figureid: require '../../assets/sprites/icon-clipboard.svg'
-            timezones: require '../../lib/timezones'
 
 
     getFormData: () ->
@@ -65,7 +63,6 @@ module.exports = class InfosView extends StepView
         return {
             public_name: @$inputs['public_name'].val()
             email: @$inputs['email'].val()
-            timezone: @$inputs['timezone'].val()
         }
 
     # Returns boolean indicating if all form fields has been filled

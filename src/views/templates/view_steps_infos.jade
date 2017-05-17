@@ -28,17 +28,6 @@ block region
                 placeholder=t("step infos email placeholder"))
             p.error-label(data-for="email")
 
-        p(class='line')
-            label(for="timezone")=t('step infos timezone label')
-            select(type="text", name="timezone", id="timezone")
-                each label in timezones
-                    if(label === timezone)
-                        option(value=label, selected="selected")=label
-                    else
-                        option(value=label)=label
-
-            p.error-label(data-for="timezone")
-
 
 block controls
     button(class="next", form="infos-form")= t('step infos submit')
