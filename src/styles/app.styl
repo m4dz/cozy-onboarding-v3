@@ -49,17 +49,34 @@ header
             display  block
 
         svg
-            max-width       (72 / 16)em
-            height          (72 / 16)em
+            max-width       (56 / 16)em
+            height          (56 / 16)em
 
 
         .svg-wrapper
             margin          auto
-            max-width       (72 / 16)em
-            height          (72 / 16)em
+            max-width       (56 / 16)em
+            height          (56 / 16)em
             border-radius   50%
-            padding         1em
+            padding         (20 / 16)em
             box-shadow      0 1px 3px rgba(50,54,63,0.19), 0 4px 12px rgba(50,54,63,0.12)
+
+        // Additional badges in figure
+        .badge
+            position absolute
+            left 50%
+            margin-top -2em
+            margin-left 1em
+
+            .svg-wrapper
+                height     (24 / 16)em
+                max-width  (24 / 16)em
+                padding    (8 / 16)em
+
+            svg
+                height    (24 / 16)em
+                max-width (24 / 16)em
+
 
     h1
         margin  0
@@ -72,6 +89,12 @@ header
         line-height 1.5
         &:first-child
             margin-top 1em
+
+        &.example
+            margin-bottom 1em
+            font-style    italic
+            color         $grey-09
+
 
 .agreements
     figure
@@ -90,13 +113,16 @@ header
             padding         1.5em
             box-shadow      0 1px 3px rgba(50,54,63,0.19), 0 4px 12px rgba(50,54,63,0.12)
 
-
-
 #welcome-figure
     svg
         max-width       100%
         height          12.5em
         box-shadow      none
+
+#password-figure
+    .badge
+        .svg-wrapper
+            background #ff7f1b
 
 #maif-figure, #fing-figure
     svg
@@ -115,9 +141,6 @@ header
 // Icons
 .svg-wrapper
     background-color $blue // default color : Cozy blue
-
-#password-figure .svg-wrapper
-        background-color  #4dcec5
 
 #infos-figure .svg-wrapper
         background-color #fc4c83
@@ -227,7 +250,7 @@ form
 label
     display           block
     text-transform    uppercase
-    color             $grey-05
+    color             $grey-09
     font-size         .9em
     padding           .55em 0
 
@@ -247,7 +270,7 @@ select
     background      $white-01
     color           black
     &::placeholder
-        color       $grey-07
+        color       $grey-03
         font-size   1.05em
     &:focus
         border          1px solid $blue

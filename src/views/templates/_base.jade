@@ -9,6 +9,11 @@
                     .svg-wrapper
                         svg: use(xlink:href=figureid)
 
+                    if badgeId
+                      .badge
+                        .svg-wrapper
+                          svg: use(xlink:href=badgeId)
+
         block header
 
     div(role="region")
