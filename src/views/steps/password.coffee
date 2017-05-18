@@ -70,7 +70,8 @@ module.exports = class PasswordView extends StepView
     serializeData: () ->
         return Object.assign {}, @serializeInputData(), {
             id:         "#{@model.get 'name'}-figure"
-            figureid:   require '../../assets/sprites/icon-lock.svg'
+            figureid:   require '../../assets/sprites/icon-cozy.svg'
+            badgeId: require '../../assets/sprites/icon-shield-24.svg'
             passwordStrength: @passwordStrength
         }
 
