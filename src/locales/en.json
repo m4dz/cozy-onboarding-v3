@@ -41,7 +41,7 @@
     "step password submit": "confirm",
     "step password show": "Display",
     "step password hide": "Hide",
-    "step password description": "Try to use an uppercase, a number and a special character to have a stronger password.",
+    "step password description": "Try to use an <strong>uppercase</strong>, a <strong>number</strong> and a <strong>special character</strong> to have a stronger password.",
     "step password example": "Example: your favorite song",
     "step password server error": "Something went wrong. Your password has not been saved.",
     "step infos title": "Complete your Cozy",
