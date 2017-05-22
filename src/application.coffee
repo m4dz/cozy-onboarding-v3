@@ -71,7 +71,7 @@ class App extends Application
           .replace("onboarding.", "collect.")
 
         [url, _] = url.split('#')
-        url += "#/discovery/?intro?"
+        url += "#/discovery/?intro"
 
         # default app redirection is handled by the stack
         window.location.replace url
