@@ -20,7 +20,9 @@ module.exports = {
       __SERVER__: false,
       __DEVELOPMENT__: false,
       __DEVTOOLS__: false,
-      __STACK_ASSETS__: true
+      __STACK_ASSETS__: true,
+      __PIWIK_TRACKER_URL__: JSON.stringify('https://piwik.cozycloud.cc/piwik.php'),
+      __PIWIK_SITEID__: 11
     })
   ]
 }

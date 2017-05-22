@@ -28,6 +28,7 @@
 <% if (__STACK_ASSETS__) { %>
 {{.CozyClientJS}}
 <% } %>
+<script src="//{{.Domain}}/assets/js/piwik.js" defer></script>
 <% _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
   <script src="<%- file %>" defer></script>
 <% }); %>
