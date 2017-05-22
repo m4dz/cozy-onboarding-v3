@@ -66,7 +66,13 @@ class App extends Application
     # Internal handler called when the onboarding is finished
     # Redirect to given app
     handleTriggerDone: () ->
-        url = "//#{@domain}"
+        url = window.location.toString()
+          .replace("-onboarding", "-collect")
+          .replace("onboarding.", "collect.")
+
+        [url, _] = url.split('#')
+        url += "#/discovery/?intro"
+
         # default app redirection is handled by the stack
         window.location.replace url
 
