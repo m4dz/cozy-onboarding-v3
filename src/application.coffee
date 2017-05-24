@@ -36,9 +36,13 @@ class App extends Application
           cozy.client.init \
             cozyURL: "//#{applicationElement.dataset.cozyStack}",
             token: @contextToken
-            
-        tracker = Piwik.getTracker(__PIWIK_TRACKER_URL__, __PIWIK_SITEID__)
-        tracker.enableHeartBeatTimer()
+
+        try
+            tracker = Piwik.getTracker(__PIWIK_TRACKER_URL__, __PIWIK_SITEID__)
+            tracker.enableHeartBeatTimer()
+        catch error
+          console.warn and console.warn 'Unable to initialize Piwik.'
+
 
         @on 'start', (options)=>
             @layout = new AppLayout()
@@ -63,9 +67,13 @@ class App extends Application
     # changed.
     # @param step Step instance
     handleStepChanged: (onboarding, step) ->
-        tracker = Piwik.getTracker(__PIWIK_TRACKER_URL__, __PIWIK_SITEID__)
-        tracker.setCustomUrl step.name
-        tracker.trackPageView()
+        try
+            tracker = Piwik.getTracker(__PIWIK_TRACKER_URL__, __PIWIK_SITEID__)
+            tracker.setCustomUrl step.name
+            tracker.trackPageView()
+        catch error
+            console.warn and console.warn 'Unable to use Piwik.'
+
         @showStep onboarding, step
 
 
