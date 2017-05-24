@@ -40,6 +40,13 @@ class App extends Application
         try
             tracker = Piwik.getTracker(__PIWIK_TRACKER_URL__, __PIWIK_SITEID__)
             tracker.enableHeartBeatTimer()
+            
+            userId = @domain
+            indexOfPort = userId.indexOf(':')
+            if indexOfPort >= 0 then userId = userId.substring(0, indexOfPort)
+            
+            tracker.setUserId(userId)
+            tracker.setCustomDimension(__PIWIK_DIMENSION_ID_APP__, applicationElement.dataset.cozyAppName)
         catch error
           console.warn and console.warn 'Unable to initialize Piwik.'
 

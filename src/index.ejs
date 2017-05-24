@@ -32,4 +32,4 @@
 <% _.forEach(htmlWebpackPlugin.files.js, function(file) { %>
   <script src="<%- file %>" defer></script>
 <% }); %>
-<div role="application" data-token="{{.Token}}" data-cozy-stack="{{.Domain}}">
+<div role="application" data-token="{{.Token}}" data-cozy-stack="{{.Domain}}" data-cozy-app-name="{{.AppName}}">
