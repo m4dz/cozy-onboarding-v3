@@ -74,6 +74,7 @@
     "step services next": "Go on",
     "step services pass": "Skip this step",
     "step server error": "An error occurred while saving your progression. Reloading the page should fix the problem.",
+    "service connected": "Connected",
     "preset name tip": "It's displayed when you share files with people or invite them to events.",
     "preset password": "password",
     "preset password tip": "A strong password of at least 8 characters is required (special characters recommended).",
