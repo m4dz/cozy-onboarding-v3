@@ -35,7 +35,7 @@
     "preset name": "name",
     "step password empty": "Password's value is missing.",
     "step password too weak": "Your password is too weak. You should add an uppercase, a number, a special character or a longer password.",
-    "step password title": "Step 3: Choose your password",
+    "step password title": "Choose your password",
     "step password label": "password",
     "step password input placeholder": "e.g. \"dEj875ghj9273;eR\"",
     "step password submit": "confirm",
