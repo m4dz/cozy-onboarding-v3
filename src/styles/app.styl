@@ -35,9 +35,17 @@ main > div
 
 
 .main-wrapper
-    flex       0 1 30em
+    flex       1
     margin     auto
     padding    3em 1em
+
+
+    header
+    [role=region] form
+    footer
+        max-width 30em
+        text-align center
+        margin auto
 
 
 header
@@ -89,6 +97,7 @@ header
         line-height 1.5
         &:first-child
             margin 1em 0
+
 
 
 .agreements
@@ -492,7 +501,8 @@ footer
     margin-right -.75em
 
 .service
-    flex 1 9em
+    flex 1 14em
+    max-width 14em
     margin .75em
     border 1px solid $grey-10
     border-radius 4px
